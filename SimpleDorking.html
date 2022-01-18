@@ -1,0 +1,64 @@
+<head>
+    <title>Simple Dorking</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function toggle(site) {
+            $("#" + getId(site)).toggle(400);
+        }
+        function getId(site) {
+            return site.replace(".", "");
+        }
+        function getOutput(site, query) {
+            return `<div class="title" onclick="toggle('${site}')">${site}</div>` +
+                `<iframe id="${getId(site)}" src="https://www.google.com/search?igu=1&q=site%3A${site}+&quot;${query}&quot;"></iframe>`
+        }
+        function update() {
+            // remove current output
+            $("iframe").remove();
+            $("div.title").remove();
+
+            // add new iframes based on sites/query
+            let query = $("input#query").val();
+            $("div#output").append($("input#sites").val().split(',').map(s => s.trim()).map(s => getOutput(s, query)))
+            $("iframe").hide()
+        }
+    </script>
+</head>
+<style>
+    th, td {
+        text-align: left;
+    }
+    iframe {
+        margin-left: 5%;
+        width: 95%;
+        height: 100%;
+    }
+    input {
+        width: 100%;
+    }
+</style>
+<body>
+    <div>
+        <table width=100%>
+            <tr>
+                <th>sites</th>
+                <th>query text</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>
+                    <input id="sites" type="text" value="reddit.com, youtube.com, gab.com">
+                </td>
+                <td>
+                    <input id="query" value="biden">
+                </td>
+                <td>
+                    <button onclick="update()">update</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="output">
+    </div>
+</body>
