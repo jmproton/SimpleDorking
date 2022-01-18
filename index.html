@@ -2,6 +2,11 @@
     <title>Simple Dorking</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
+        function getLastYear() {
+            let today = new Date();
+            let lastYear = new Date(new Date().setFullYear(today.getFullYear() - 1));
+            return `${lastYear.getFullYear()}-${lastYear.getMonth() + 1}-${lastYear.getDate()}`
+        }
         function toggle(site) {
             $("#" + getId(site)).toggle(400);
         }
@@ -9,8 +14,9 @@
             return site.replace(".", "");
         }
         function getOutput(site, query) {
+            let encodedQuery = encodeURIComponent(`site:${site} "${query}" after:${getLastYear()}`)
             return `<div class="title" onclick="toggle('${site}')">${site}</div>` +
-                `<iframe id="${getId(site)}" src="https://www.google.com/search?igu=1&q=site%3A${site}+&quot;${query}&quot;"></iframe>`
+                `<iframe id="${getId(site)}" src="https://www.google.com/search?igu=1&q=${encodedQuery}"></iframe>`
         }
         function update() {
             // remove current output
