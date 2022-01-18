@@ -2,6 +2,18 @@
     <title>Simple Dorking</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
+        var custom = {};
+        $(document).ready(function() {
+            const data = window.sessionStorage.getItem("input-data");
+
+            // populate from storage, if it exists
+            if (data) {
+                for (const [key, value] of Object.entries(JSON.parse(data))) {
+                    $("input#" + key).val(value);
+                    custom[key] = value;
+                }
+            }
+        });
         function getLastYear() {
             let today = new Date();
             let lastYear = new Date(new Date().setFullYear(today.getFullYear() - 1));
@@ -14,11 +26,21 @@
             return site.replace(".", "");
         }
         function getOutput(site, query) {
-            let encodedQuery = encodeURIComponent(`site:${site} "${query}" after:${getLastYear()}`)
-            return `<div class="title" onclick="toggle('${site}')">${site}</div>` +
+            let customAddition = custom[getId(site) + '-custom'] || "";
+            let encodedQuery = encodeURIComponent(`site:${site} after:${getLastYear()} ${customAddition} "${query}"`);
+            return `<div class="title">` +
+                `<span onclick="toggle('${site}')">${site}</span><input id="${getId(site) + '-custom'}" value="${customAddition}" placeholder="Custom site query"></div>` +
                 `<iframe id="${getId(site)}" src="https://www.google.com/search?igu=1&q=${encodedQuery}"></iframe>`
         }
         function update() {
+            // capture customization
+            $("input").filter((index, el) => !["sites", "query"].includes(el.id)).each((index, el) => custom[el.id] = el.value);
+
+            const data = Object.assign({}, custom);
+            data["query"] = $("input#query").val();
+            data["sites"] = $("input#sites").val();
+            window.sessionStorage.setItem("input-data", JSON.stringify(data));
+
             // remove current output
             $("iframe").remove();
             $("div.title").remove();
@@ -39,7 +61,7 @@
         width: 95%;
         height: 100%;
     }
-    input {
+    td input {
         width: 100%;
     }
 </style>
@@ -53,7 +75,7 @@
             </tr>
             <tr>
                 <td>
-                    <input id="sites" type="text" value="reddit.com, youtube.com, gab.com">
+                    <input id="sites" type="text" value="reddit.com, youtube.com, gab.com, thegatewaypundit.com, bitchute.com, skidbin.net, 8kun.top">
                 </td>
                 <td>
                     <input id="query" value="biden">
