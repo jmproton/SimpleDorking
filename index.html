@@ -1,6 +1,7 @@
-<head>
+ <head>
     <title>Simple Dorking</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script>
         var custom = {};
         $(document).ready(function() {
@@ -14,10 +15,14 @@
                 }
             }
         });
-        function getLastYear() {
-            let today = new Date();
-            let lastYear = new Date(new Date().setFullYear(today.getFullYear() - 1));
-            return `${lastYear.getFullYear()}-${lastYear.getMonth() + 1}-${lastYear.getDate()}`
+        function getAfter() {
+            let selected = $("select#after").val()
+            let count = 1;
+            if (selected === "half") {
+                selected = "months";
+                count = 6;
+            }
+            return "after:" + moment().subtract(count, selected).format("YYYY-MM-DD");
         }
         function toggle(site) {
             $("#" + getId(site)).toggle(400);
@@ -27,7 +32,7 @@
         }
         function getOutput(site, query) {
             let customAddition = custom[getId(site) + '-custom'] || "";
-            let encodedQuery = encodeURIComponent(`site:${site} after:${getLastYear()} ${customAddition} "${query}"`);
+            let encodedQuery = encodeURIComponent(`site:${site} ${getAfter()} ${customAddition} "${query}"`);
             return `<div class="title">` +
                 `<span onclick="toggle('${site}')">${site}</span><input id="${getId(site) + '-custom'}" value="${customAddition}" placeholder="Custom site query"></div>` +
                 `<iframe id="${getId(site)}" src="https://www.google.com/search?igu=1&q=${encodedQuery}"></iframe>`
@@ -64,6 +69,9 @@
     td input {
         width: 100%;
     }
+    .dropdown {
+        width: 80px;
+    }
 </style>
 <body>
     <div>
@@ -72,6 +80,7 @@
                 <th>sites</th>
                 <th>query text</th>
                 <th></th>
+                <th></th>
             </tr>
             <tr>
                 <td>
@@ -79,6 +88,15 @@
                 </td>
                 <td>
                     <input id="query" value="biden">
+                </td>
+                <td class="dropdown">
+                    <select id="after" class="dropdown">
+                        <option value="years" selected>1 Year</option>
+                        <option value="half">6 months</option>
+                        <option value="months">1 month</option>
+                        <option value="weeks">1 week</option>
+                        <option value="days">1 day</option>
+                    </select>
                 </td>
                 <td>
                     <button onclick="update()">update</button>
