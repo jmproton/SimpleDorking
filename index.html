@@ -1,20 +1,11 @@
- <head>
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
     <title>Simple Dorking</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script async src="https://cse.google.com/cse.js?cx=b099d6700a5dfe496"></script>
     <script>
-        var custom = {};
-        $(document).ready(function() {
-            const data = window.sessionStorage.getItem("input-data");
-
-            // populate from storage, if it exists
-            if (data) {
-                for (const [key, value] of Object.entries(JSON.parse(data))) {
-                    $("input#" + key).val(value);
-                    custom[key] = value;
-                }
-            }
-        });
         function getAfter() {
             let selected = $("select#after").val()
             let count = 1;
@@ -24,87 +15,29 @@
             }
             return "after:" + moment().subtract(count, selected).format("YYYY-MM-DD");
         }
-        function toggle(site) {
-            $("#" + getId(site)).toggle(400);
-        }
-        function getId(site) {
-            return site.replace(".", "");
-        }
-        function getOutput(site, query) {
-            let customAddition = custom[getId(site) + '-custom'] || "";
-            let encodedQuery = encodeURIComponent(`site:${site} ${getAfter()} ${customAddition} "${query}"`);
-            return `<div class="title">` +
-                `<span onclick="toggle('${site}')">${site}</span><input id="${getId(site) + '-custom'}" value="${customAddition}" placeholder="Custom site query"></div>` +
-                `<iframe id="${getId(site)}" src="https://www.google.com/search?igu=1&q=${encodedQuery}"></iframe>`
-        }
-        function update() {
-            // capture customization
-            $("input").filter((index, el) => !["sites", "query"].includes(el.id)).each((index, el) => custom[el.id] = el.value);
-
-            const data = Object.assign({}, custom);
-            data["query"] = $("input#query").val();
-            data["sites"] = $("input#sites").val();
-            window.sessionStorage.setItem("input-data", JSON.stringify(data));
-
-            // remove current output
-            $("iframe").remove();
-            $("div.title").remove();
-
-            // add new iframes based on sites/query
-            let query = $("input#query").val();
-            $("div#output").append($("input#sites").val().split(',').map(s => s.trim()).map(s => getOutput(s, query)))
-            $("iframe").hide()
-        }
+        window.__gcse || (window.__gcse = {});
+        window.__gcse.searchCallbacks = {
+            web: {
+                starting: function(gname, query) {
+                    console.log(query);
+                    return getAfter() + ' ' + query;
+                }
+            },
+        };
     </script>
 </head>
 <style>
-    th, td {
-        text-align: left;
-    }
-    iframe {
-        margin-left: 5%;
-        width: 95%;
-        height: 100%;
-    }
-    td input {
-        width: 100%;
-    }
     .dropdown {
         width: 80px;
     }
 </style>
 <body>
-    <div>
-        <table width=100%>
-            <tr>
-                <th>sites</th>
-                <th>query text</th>
-                <th></th>
-                <th></th>
-            </tr>
-            <tr>
-                <td>
-                    <input id="sites" type="text" value="reddit.com, youtube.com, gab.com, thegatewaypundit.com, bitchute.com, skidbin.net, 8kun.top">
-                </td>
-                <td>
-                    <input id="query" value="biden">
-                </td>
-                <td class="dropdown">
-                    <select id="after" class="dropdown">
-                        <option value="years" selected>1 Year</option>
-                        <option value="half">6 months</option>
-                        <option value="months">1 month</option>
-                        <option value="weeks">1 week</option>
-                        <option value="days">1 day</option>
-                    </select>
-                </td>
-                <td>
-                    <button onclick="update()">update</button>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div id="output">
-    </div>
+    <select id="after" class="dropdown">
+        <option value="years" selected>1 Year</option>
+        <option value="half">6 months</option>
+        <option value="months">1 month</option>
+        <option value="weeks">1 week</option>
+        <option value="days">1 day</option>
+    </select>
+    <div class="gcse-search"></div>
 </body>
