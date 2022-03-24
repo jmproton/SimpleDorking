@@ -94,7 +94,7 @@
             span.textContent = name;
 
             const title = document.createElement('div');
-            title.id = name;
+            title.id = engine + '-title';
             title.style = 'cursor:pointer;'
             title.onclick = getClickHandler(engine);
             title.appendChild(icon);
@@ -144,13 +144,13 @@
                         observer.disconnect();
                         delete observers[engine];
                     }
-                    $(`#${engines[engine]}`).remove();
-                    $(`#${engine}`).remove();
-                    $(`#${engine}-hr`).remove();
+                    // remove all nodes associated with engine id
+                    $(`[id^="${engine}"]`).remove();
+                    // remove css
+                    removeCSS(`[id="${engine}"]`);
                 } else if (engines[engine] !== name) {
                     // change name if engine is unchanged, but name is different
-                    let div = document.getElementById(engines[engine]);
-                    div.id = name;
+                    let div = document.getElementById(engine + '-title');
                     $('.name', div)[0].textContent = name;
                 }
             }
@@ -164,6 +164,15 @@
             closeSettings();
         }
 
+        function removeCSS(selector) {
+            const styleSheet = window.document.styleSheets[1];
+            // remove css if exists
+            const index = Array.from(styleSheet.cssRules).findIndex(r=>r.selectorText === selector);
+            if (index > -1) {
+                styleSheet.deleteRule(index);
+            }
+        }
+
         const observers = {};
         window.addEventListener('message', function(e) {
             const id = e.data.id;
@@ -172,7 +181,11 @@
                 observers[id] = new ResizeObserver(entries => {
                     const height = entries[0].contentRect.height;
                     if (height > 0) {
-                        iframe.style.height = height + 'px'
+                        const selector = `[id="${id}"]`
+                        removeCSS(selector);
+                        // insert new css
+                        const styleSheet = window.document.styleSheets[1];
+                        styleSheet.insertRule(`${selector} { height: ${height}px; }`, styleSheet.cssRules.length)
                     }
                 });
             }
