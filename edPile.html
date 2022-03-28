@@ -93,12 +93,19 @@
             span.className = 'name';
             span.textContent = name;
 
+            const link = document.createElement('a');
+            link.href = 'https://cse.google.com/cse?cx=' + engine;
+            link.target = '_blank';
+            link.onclick = event => event.stopPropagation();
+            link.appendChild(getIcon('link'));
+
             const title = document.createElement('div');
             title.id = engine + '-title';
-            title.style = 'cursor:pointer;'
+            title.className = 'title';
             title.onclick = getClickHandler(engine);
             title.appendChild(icon);
             title.appendChild(span);
+            title.appendChild(link);
             content.appendChild(title)
 
             const iframe = document.createElement('iframe');
@@ -235,6 +242,11 @@
     }
     html {
         height: 100%;
+    }
+    .title {
+        display: flex;
+        align-items: center;
+        cursor:pointer;
     }
     .settings {
         height: 100%; /* Specify a height */
