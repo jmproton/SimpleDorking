@@ -181,8 +181,8 @@
         }
 
         const observers = {};
-        window.addEventListener('message', function(e) {
-            const id = e.data.id;
+        function observeHeight(data) {
+            const id = data.id;
             const iframe = document.getElementById(id);
             if (!observers[id]) {
                 observers[id] = new ResizeObserver(entries => {
@@ -197,7 +197,7 @@
                 });
             }
             observers[id].observe(iframe.contentWindow.document.scrollingElement);
-        });
+        }
 
         function executeQuery(evt) {
             evt.preventDefault();
