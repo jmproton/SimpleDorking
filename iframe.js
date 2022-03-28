@@ -1,5 +1,5 @@
 myWebResultsRenderedCallback = function() {
-    window.parent.postMessage({id:window['iframeId'], height:document.body.scrollHeight});
+    window.parent.observeHeight({id:window['iframeId'], height:document.body.scrollHeight});
 };
 window.__gcse || (window.__gcse = {});
 window.__gcse.searchCallbacks = {
