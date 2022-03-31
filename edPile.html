@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
     <title>EdPile</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js  "></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         const defaultEngines = {
             '6c5e2e1d84f67f5f4':'Boards+Blogs 1',
@@ -81,13 +81,28 @@
             createSettings(defaultEngines);
         }
 
+        function setRecent(engine, recent) {
+            if (!recent) {
+                return;
+            }
+            const id = engine + '-recent'
+            let element = document.getElementById(id) // get recent
+            if (!element) {
+                // create element and add it
+                element = document.createElement('span');
+                element.id = id;
+                document.getElementById(engine + '-title').appendChild(element);
+            }
+            element.textContent = `(${recent})`;
+        }
+
         function addEngineContent(engine, name) {
             const script = 'script';
             const head = 'head';
             const content = document.getElementById('content');
 
             const icon = getIcon('expand_less');
-            icon.classList.add('normal')
+            icon.classList.add('rotated');
 
             const span = document.createElement('span');
             span.className = 'name';
@@ -113,6 +128,7 @@
                 '<head>' +
                 `<${script} async src="https://cse.google.com/cse.js?cx=${engine}"></${script}>` +
                 `<${script} src="./iframe.js"></${script}>` +
+                `<${script} src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.min.js"></${script}>` +
                 `<${script}>var iframeId='${engine}'</${script}>` +
                 `</head>` +
                 '<style>html { overflow-y: hidden; }</style>' +
@@ -217,6 +233,8 @@
 
                 document.getElementById('cse-search-box-form-id').addEventListener('submit', executeQuery);
                 $('#menu').on('click', openSettings);
+                $('iframe').toggle();
+
             }
         });
     </script>
@@ -347,4 +365,3 @@
         <!-- End of search box form -->
     </div>
 </body>
-
