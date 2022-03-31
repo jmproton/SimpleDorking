@@ -1,17 +1,14 @@
-var times = ['minutes', 'hours', 'days'];
 
 function getDate(text, curr) {
-    for (let type of times) {
+    const times = {
+        minute: dateFns.subMinutes,
+        hour: dateFns.subHours,
+        day: dateFns.subDays
+    };
+    for (let type of Object.keys(times)) {
         if (text.includes(type)) {
             const value = parseInt(text.split(' ' + type)[0]);
-            switch (type) {
-                case 'minutes':
-                    return dateFns.subMinutes(curr, value);
-                case 'hours':
-                    return dateFns.subHours(curr, value);
-                case 'days':
-                    return dateFns.subDays(curr, value);
-            }
+            return times[type](curr, value);
         }
     }
     return new Date(text);
