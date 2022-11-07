@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <head>
     <title>EdPile</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         const defaultEngines = {
-            '6c5e2e1d84f67f5f4':'Boards+Blogs 1',
-            'a86bde617c21c242b':'Boards+Blogs 2',
-            'a17e7459d7303301f':'Media Sharing 1',
-            'f107441de869c3d79':'Media Sharing 2',
-            'd4f013ab1d4c36589':'Media Search 1',
-            '162a82295351c7609':'Media Search 2',
-            '467552cbb857ad79c':'Other Search 1',
-            '73ba84dba6e7559c8':'Other Search 2',
-            '0d6692616d76e26fe':'Social Media'
+            '6c5e2e1d84f67f5f4': 'Boards+Blogs 1',
+            'a86bde617c21c242b': 'Boards+Blogs 2',
+            'a17e7459d7303301f': 'Media Sharing 1',
+            'f107441de869c3d79': 'Media Sharing 2',
+            'd4f013ab1d4c36589': 'Media Search 1',
+            '162a82295351c7609': 'Media Search 2',
+            '467552cbb857ad79c': 'Other Search 1',
+            '73ba84dba6e7559c8': 'Other Search 2',
+            '0d6692616d76e26fe': 'Social Media'
         };
         let engines = Object.assign({}, defaultEngines);
         let uuid = 0;
+        let checkedUrls = [];
+        let downloadData = [
+            ["type", "url"]
+        ];
 
         function getIcon(span) {
             const icon = document.createElement('span');
@@ -26,7 +31,7 @@
         }
 
         function getClickHandler(engine) {
-            return function() {
+            return function () {
                 $('#' + engine).slideToggle(250);
                 $('.material-icons', this).toggleClass('rotated normal');
             };
@@ -143,8 +148,8 @@
 
         function updateSettings() {
             newEngines = {};
-            const engineArr = Array.from($('[is-engine]')).map(e=>e.textContent);
-            const nameArr = Array.from($('[is-name]')).map(e=>e.textContent);
+            const engineArr = Array.from($('[is-engine]')).map(e => e.textContent);
+            const nameArr = Array.from($('[is-name]')).map(e => e.textContent);
             for (let i = 0; i < nameArr.length; i++) {
                 const engine = engineArr[i];
                 const name = nameArr[i];
@@ -190,7 +195,7 @@
         function removeCSS(selector) {
             const styleSheet = window.document.styleSheets[1];
             // remove css if exists
-            const index = Array.from(styleSheet.cssRules).findIndex(r=>r.selectorText === selector);
+            const index = Array.from(styleSheet.cssRules).findIndex(r => r.selectorText === selector);
             if (index > -1) {
                 styleSheet.deleteRule(index);
             }
@@ -224,17 +229,92 @@
             return false;
         }
 
+        function addCheckBoxes(e) {
+            try {
+                Object.entries(defaultEngines).forEach(([key, value], index) => {
+                    const myIframe = document.getElementById(`${key}`);
+                    for (let i = 0; i < 10; i++) {
+                        const resultElement = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1})`);
+                        const url = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > div.gs-webResult.gs-result > div.gsc-thumbnail-inside > div > a`).href;
+                        const inputElement = document.createElement('INPUT');
+                        inputElement.setAttribute("type", "checkbox");
+                        inputElement.setAttribute("name", url);
+                        inputElement.setAttribute("value", url);
+                        inputElement.setAttribute("style", "float:  left; margin-right: 20px;");
+                        inputElement.innerHTML = "Checkbox";
+                        inputElement.onclick = function () {
+                            const valueUrl = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`).value;
+                            const isChecked = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`).checked;
+                            if (isChecked) {
+                                checkedUrls.push(valueUrl);
+                            }
+                            else {
+                                checkedUrls = checkedUrls.filter(item => item !== valueUrl);
+                            }
+                        };
+                        resultElement.insertBefore(inputElement, resultElement.firstChild);
+                    }
+                });
+            }
+            catch (err) {
+            }
+        }
+
+        function addCheckedUrls() {
+            let scraperType = document.getElementById('scraper-select').value;
+            checkedUrls = [...new Set(checkedUrls)]; // remove duplicates
+            for (let i = 0; i < checkedUrls.length; i++) {
+                downloadData.push([scraperType, checkedUrls[i]]);
+            }
+            resetCheckedUrls();
+        }
+
+        function downloadCheckedUrls() {
+            downloadData = downloadData.filter((t = {}, a => !(t[a] = a in t)));
+            if (downloadData.length > 1) {
+                let csvContent = "data:text/csv;charset=utf-8," + downloadData.map(e => e.join(",")).join("\n");
+                let encodedUri = encodeURI(csvContent);
+                window.open(encodedUri);
+            }
+            resetCheckedUrls();
+            resetDownloadData();
+        }
+
+        function resetCheckedUrls() {
+            checkedUrls = [];
+        }
+
+        function resetDownloadData() {
+            checkedUrls = [];
+            downloadData = [
+                ["type", "url"]
+            ];
+        }
+
         document.addEventListener('readystatechange', e => {
             if (document.readyState === 'interactive') {
                 for (let [engine, name] of Object.entries(engines)) {
                     addEngineContent(engine, name);
                     addSettingsRow(name, engine);
                 }
-
-                document.getElementById('cse-search-box-form-id').addEventListener('submit', executeQuery);
+                document.getElementById('cse-search-box-form-id').addEventListener('submit', function (e) {
+                    executeQuery(e);
+                    addCheckBoxes(e);
+                });
+                document.getElementById('AddCheckedUrls').addEventListener('click', function (e) {
+                    addCheckedUrls();
+                });
+                document.getElementById('ResetCheckedUrls').addEventListener('click', function (e) {
+                    resetCheckedUrls();
+                });
+                document.getElementById('ResetDownloadData').addEventListener('click', function (e) {
+                    resetDownloadData();
+                });
+                document.getElementById('DownloadCheckedUrls').addEventListener('click', function (e) {
+                    downloadCheckedUrls();
+                });
                 $('#menu').on('click', openSettings);
                 $('iframe').toggle();
-
             }
         });
     </script>
@@ -246,40 +326,53 @@
         height: 0;
         overflow-y: hidden;
     }
+
     body {
         height: calc(100% - 8px)
     }
+
     .content {
         flex-grow: 1;
         overflow-y: auto;
     }
+
     .header {
         display: flex;
         align-items: flex-start;
         /* justify-content: space-between; */
     }
+
     html {
         height: 100%;
     }
+
     .title {
         display: flex;
         align-items: center;
-        cursor:pointer;
+        cursor: pointer;
     }
+
     .settings {
-        height: 100%; /* Specify a height */
-        width: 0px; /* 0 width - change this with JavaScript */
+        height: 100%;
+        /* Specify a height */
+        width: 0px;
+        /* 0 width - change this with JavaScript */
         background-color: white;
         white-space: nowrap;
         padding-top: 60px;
-        position: fixed; /* Stay in place */
-        z-index: 1; /* Stay on top */
+        position: fixed;
+        /* Stay in place */
+        z-index: 1;
+        /* Stay on top */
         top: 0;
         left: 0;
-        overflow-x: hidden; /* Disable horizontal scroll */
-        transition: 0.5s; /* 0.5 second transition effect to slide in the sidepanel */
+        overflow-x: hidden;
+        /* Disable horizontal scroll */
+        transition: 0.5s;
+        /* 0.5 second transition effect to slide in the sidepanel */
         border-right: solid;
     }
+
     .settings .closebtn {
         position: absolute;
         top: 0;
@@ -288,36 +381,45 @@
         margin-left: 50px;
         cursor: pointer;
     }
+
     #menu {
         cursor: pointer;
     }
+
     #grid {
         display: grid;
         grid-template-columns: 25px 150px 175px;
     }
+
     .grid-item {
         display: flex;
     }
+
     .rotated {
         transform: rotate(180deg);
         transition: 0.25s;
     }
+
     .normal {
         transform: rotate(0deg);
         transition: 0.25s;
     }
+
     .delete {
         cursor: pointer;
         color: red;
     }
+
     .buttons {
         display: flex;
         justify-content: space-between;
     }
+
     .logo {
         width: 255px;
         height: auto;
     }
+
     /* #delete, #names, #engines {
         display: flex;
         flex-direction: column;
@@ -333,6 +435,7 @@
         flex: 1 1;
     } */
 </style>
+
 <body>
     <div class="settings" id="settings">
         <span class="closebtn" onclick="closeSettings()">&times;</span>
@@ -356,12 +459,38 @@
         <!-- Search box form -->
         <form id="cse-search-box-form-id">
             <!-- This is the input searc box -->
-            <input type="text" id="cse-search-input-box-id" size="25" autocomplete="false"/>
+            <input type="text" id="cse-search-input-box-id" size="25" autocomplete="false" />
             <!-- This is the search button -->
-            <input type="submit" value="Search"/>
+            <input type="submit" value="Search" />
+            <select name="scraper" id="scraper-select">
+                <option value=""></option>
+                <option value="Disqus">Disqus</option>
+                <option value="Bitchute Comments">Bitchute Comments</option>
+                <option value="Bitchute Transcript">Bitchute Transcript</option>
+                <option value="Reddit">Reddit</option>
+                <option value="Fox News Comments">Fox News Comments</option>
+                <option value="YouTube Comments">YouTube Comments</option>
+                <option value="YouTube Video Transcript">YouTube Video Transcript</option>
+                <option value="Patriots.Win Comments">Patriots.Win Comments</option>
+                <option value="Banned.Video Comments">Banned.Video Comments</option>
+                <option value="Facebook Search">Facebook Search</option>
+                <option value="Facebook URL">Facebook URL</option>
+                <option value="Facebook Video Transcript">Facebook Video Transcript</option>
+                <option value="Conservative Treehouse Comments">Conservative Treehouse Comments</option>
+                <option value="Gab Video Transcript">Gab Video Transcript</option>
+                <option value="Gettr Video Transcript">Gettr Video Transcript</option>
+                <option value="Instagram Video Transcript">Instagram Video Transcript</option>
+                <option value="Rumble Video Transcript">Rumble Video Transcript</option>
+                <option value="Telegram Video Transcript">Telegram Video Transcript</option>
+                <option value="Twitter Video Transcript">Twitter Video Transcript</option>
+            </select>
+            <input type="submit" value="Add" id="AddCheckedUrls" />
+            <input type="submit" value="Unselect All" id="ResetCheckedUrls" />
+            <input type="submit" value="Reset All" id="ResetDownloadData" />
+            <input type="submit" value="Download" id="DownloadCheckedUrls" />
         </form>
         <script src="//www.google.com/cse/brand?form=cse-search-box-form-id&inputbox=cse-search-input-box-id"></script>
-        <br/>
+        <br />
         <!-- End of search box form -->
     </div>
 </body>
