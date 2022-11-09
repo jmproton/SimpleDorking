@@ -28,6 +28,7 @@
         let downloadData = [
             ["type", "url"]
         ];
+        let isOpenSetting = false;
 
         function getIcon(span) {
             const icon = document.createElement('span');
@@ -44,11 +45,19 @@
         }
 
         function openSettings() {
-            document.getElementById("settings").style.width = '350px';
+            if (isOpenSetting) {
+                closeSettings();
+            }
+            else {
+                document.getElementById("settings").style.width = '350px';
+                document.getElementById("settings").style.marginTop = '150px';
+                isOpenSetting = true;
+            }
         }
 
         function closeSettings() {
             document.getElementById("settings").style.width = '0';
+            isOpenSetting = false;
             createSettings(engines);
         }
 
@@ -327,6 +336,40 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <style>
+    #menu {
+        cursor: pointer;
+    }
+
+    #grid {
+        display: grid;
+        grid-template-columns: 25px 150px 175px;
+    }
+
+    #boxThis {
+        padding: 5px;
+        background-color: #80c294;
+        font-size: 1.5em;
+        width: 100%;
+        text-align: center;
+        font-weight: bold;
+        border: 1px solid #666;
+        -webkit-border-radius: 10px;
+        border-radius: 10px;
+    }
+
+    #boxThis.box {
+        margin-top: 0;
+        position: fixed;
+        top: 0;
+        z-index: 9999;
+        -webkit-border-radius: 0 0 10px 10px;
+        border-radius: 0 0 10px 10px;
+    }
+
+    #cse-search-input-box-id {
+        width: 210px;
+    }
+
     iframe {
         width: 100%;
         height: 0;
@@ -334,7 +377,7 @@
     }
 
     body {
-        height: calc(100% - 8px)
+        height: calc(100% - 8px);
     }
 
     .content {
@@ -388,15 +431,6 @@
         cursor: pointer;
     }
 
-    #menu {
-        cursor: pointer;
-    }
-
-    #grid {
-        display: grid;
-        grid-template-columns: 25px 150px 175px;
-    }
-
     .grid-item {
         display: flex;
     }
@@ -426,6 +460,11 @@
         height: auto;
     }
 
+    .material-icons {
+        color: black;
+        background-color: white;
+    }
+
     /* #delete, #names, #engines {
         display: flex;
         flex-direction: column;
@@ -443,21 +482,8 @@
 </style>
 
 <body>
-    <div class="settings" id="settings">
-        <span class="closebtn" onclick="closeSettings()">&times;</span>
-        <div id="grid">
-            <div></div>
-            <div>Name</div>
-            <div>Engine Id</div>
-        </div>
-        <div class="buttons">
-            <button onclick="addSettingsRow()">Add</button>
-            <button onclick="reset()">Reset</button>
-            <button onclick="updateSettings()">Update</button>
-        </div>
-
-    </div>
-    <div class="content" id="content">
+    <div id="boxHere"></div>
+    <div id="boxThis">
         <div class="header">
             <span id="menu" class="material-icons">menu</span>
             <img class="logo" src="./edPile.png" alt="EdPile">
@@ -465,7 +491,7 @@
         <!-- Search box form -->
         <form id="cse-search-box-form-id">
             <!-- This is the input searc box -->
-            <input type="text" id="cse-search-input-box-id" size="25" autocomplete="false" />
+            <input type="text" id="cse-search-input-box-id" autocomplete="false" />
             <!-- This is the search button -->
             <input type="submit" value="Search" />
             <select name="scraper" id="scraper-select">
@@ -495,8 +521,49 @@
             <input type="submit" value="Reset All" id="ResetDownloadData" />
             <input type="submit" value="Download" id="DownloadCheckedUrls" />
         </form>
+    </div>
+    <div class="settings" id="settings">
+        <span class="closebtn" onclick="closeSettings()">&times;</span>
+        <div id="grid">
+            <div></div>
+            <div>Name</div>
+            <div>Engine Id</div>
+        </div>
+        <div class="buttons">
+            <button onclick="addSettingsRow()">Add</button>
+            <button onclick="reset()">Reset</button>
+            <button onclick="updateSettings()">Update</button>
+        </div>
+    </div>
+    <div class="content" id="content">
         <script src="//www.google.com/cse/brand?form=cse-search-box-form-id&inputbox=cse-search-input-box-id"></script>
         <br />
-        <!-- End of search box form -->
     </div>
+    <!-- End of search box form -->
+    <script>
+        function boxtothetop() {
+            var windowTop = $(window)
+                .scrollTop();
+            var top = $('#boxHere')
+                .offset()
+                .top;
+            if (windowTop > top) {
+                $('#boxThis')
+                    .addClass('box');
+                $('#boxHere')
+                    .height($('#boxThis')
+                        .outerHeight());
+            } else {
+                $('#boxThis')
+                    .removeClass('box');
+                $('#boxHere')
+                    .height(0);
+            }
+        }
+        $(function () {
+            $(window)
+                .scroll(boxtothetop);
+            boxtothetop();
+        });
+    </script>
 </body>
