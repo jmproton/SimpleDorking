@@ -248,16 +248,59 @@
             try {
                 Object.entries(defaultEngines).forEach(([key, value], index) => {
                     const myIframe = document.getElementById(`${key}`);
+                    const buttonStyle = "background-image: linear-gradient(#42A1EC, #0070C9); border: 1px solid #0077CC; border-radius: 4px; color: #FFFFFF; cursor: pointer; font-size: 17px; line-height: 1.47059; padding: 4px 15px; margin: 1rem;";
+
+                    // Uncheck All
+                    const hasUnCheckAll = myIframe.contentWindow.document.getElementById(`uncheckAll-${key}`);
+                    if (!hasUnCheckAll) {
+                        const section = myIframe.contentWindow.document.querySelector(`#___gcse_0`);
+                        const buttonElement = document.createElement('INPUT');
+                        buttonElement.setAttribute("type", "submit");
+                        buttonElement.setAttribute("style", buttonStyle);
+                        buttonElement.setAttribute("id", `uncheckAll-${key}`);
+                        buttonElement.setAttribute("value", "Uncheck All");
+                        buttonElement.onclick = function () {
+                            for (let i = 0; i < 10; i++) {
+                                const checkBx = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`);
+                                if (checkBx.checked === true) {
+                                    checkBx.click();
+                                }
+                            }
+                        };
+                        section.insertBefore(buttonElement, section.firstChild);
+                    }
+
+                    // Check All
+                    const hasCheckAll = myIframe.contentWindow.document.getElementById(`checkAll-${key}`);
+                    if (!hasCheckAll) {
+                        const section = myIframe.contentWindow.document.querySelector(`#___gcse_0`);
+                        const buttonElement = document.createElement('INPUT');
+                        buttonElement.setAttribute("type", "submit");
+                        buttonElement.setAttribute("style", buttonStyle);
+                        buttonElement.setAttribute("id", `checkAll-${key}`);
+                        buttonElement.setAttribute("value", "Check All");
+                        buttonElement.onclick = function () {
+                            for (let i = 0; i < 10; i++) {
+                                const checkBx = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`);
+                                if (checkBx.checked === false) {
+                                    checkBx.click();
+                                }
+                            }
+                        };
+                        section.insertBefore(buttonElement, section.firstChild);
+                    }
+
+                    // check box next to each urls
                     for (let i = 0; i < 10; i++) {
                         const resultElement = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1})`);
                         const url = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > div.gs-webResult.gs-result > div.gsc-thumbnail-inside > div > a`).href;
-                        const inputElement = document.createElement('INPUT');
-                        inputElement.setAttribute("type", "checkbox");
-                        inputElement.setAttribute("name", url);
-                        inputElement.setAttribute("value", url);
-                        inputElement.setAttribute("style", "float:  left; margin-right: 20px;");
-                        inputElement.innerHTML = "Checkbox";
-                        inputElement.onclick = function () {
+                        const checkBox = document.createElement('INPUT');
+                        checkBox.setAttribute("type", "checkbox");
+                        checkBox.setAttribute("style", "float:  left; margin-right: 20px; width: 25px; height: 25px; cursor: pointer;");
+                        checkBox.setAttribute("name", url);
+                        checkBox.setAttribute("value", url);
+                        // inputElement.innerHTML = "Checkbox";
+                        checkBox.onclick = function () {
                             const valueUrl = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`).value;
                             const isChecked = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`).checked;
                             if (isChecked) {
@@ -267,7 +310,7 @@
                                 checkedUrls = checkedUrls.filter(item => item !== valueUrl);
                             }
                         };
-                        resultElement.insertBefore(inputElement, resultElement.firstChild);
+                        resultElement.insertBefore(checkBox, resultElement.firstChild);
                     }
                 });
             }
@@ -348,10 +391,10 @@
     }
 
     #boxThis {
-        padding: 5px;
-        background-color: #80c294;
+        padding: 10px;
+        background-color: #36A9AE;
         font-size: 1.5em;
-        width: 100%;
+        width: 99%;
         text-align: center;
         font-weight: bold;
         border: 1px solid #666;
@@ -360,6 +403,7 @@
     }
 
     #boxThis.box {
+        width: 98%;
         margin-top: 0;
         position: fixed;
         top: 0;
@@ -369,7 +413,7 @@
     }
 
     #cse-search-input-box-id {
-        width: 210px;
+        width: 21rem;
     }
 
     iframe {
@@ -460,6 +504,55 @@
     .logo {
         width: 255px;
         height: auto;
+        margin: auto;
+        padding: 1rem;
+    }
+
+    .blue-bttn {
+        background-image: linear-gradient(#42A1EC, #0070C9);
+        border: 1px solid #0077CC;
+        border-radius: 4px;
+        box-sizing: border-box;
+        color: #FFFFFF;
+        cursor: pointer;
+        direction: ltr;
+        font-family: "SF Pro Text", "SF Pro Icons", "AOS Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 17px;
+        font-weight: 400;
+        letter-spacing: -.022em;
+        line-height: 1.47059;
+        min-width: 30px;
+        overflow: visible;
+        padding: 4px 15px;
+        text-align: center;
+        vertical-align: baseline;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        white-space: nowrap;
+    }
+
+    .blue-input {
+        background-image: linear-gradient(#FAF9F6, #FFFFFF);
+        border: 1px solid #0077CC;
+        border-radius: 4px;
+        box-sizing: border-box;
+        color: black;
+        direction: ltr;
+        font-family: "SF Pro Text", "SF Pro Icons", "AOS Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 17px;
+        font-weight: 400;
+        letter-spacing: -.022em;
+        line-height: 1.47059;
+        min-width: 30px;
+        overflow: visible;
+        padding: 4px 15px;
+        text-align: center;
+        vertical-align: baseline;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        white-space: nowrap;
     }
 
     /* #delete, #names, #engines {
@@ -488,10 +581,10 @@
         <!-- Search box form -->
         <form id="cse-search-box-form-id">
             <!-- This is the input searc box -->
-            <input type="text" id="cse-search-input-box-id" autocomplete="false" />
+            <input type="text" id="cse-search-input-box-id" class="blue-input" autocomplete="false" />
             <!-- This is the search button -->
-            <input type="submit" value="Search" />
-            <select name="scraper" id="scraper-select">
+            <input type="submit" value="Search" class="blue-bttn" />
+            <select name="scraper" id="scraper-select" class="blue-input">
                 <option value=""></option>
                 <option value="Disqus">Disqus</option>
                 <option value="Bitchute Comments">Bitchute Comments</option>
@@ -513,10 +606,10 @@
                 <option value="Telegram Video Transcript">Telegram Video Transcript</option>
                 <option value="Twitter Video Transcript">Twitter Video Transcript</option>
             </select>
-            <input type="submit" value="Add" id="AddCheckedUrls" />
-            <input type="submit" value="Unselect All" id="ResetCheckedUrls" />
-            <input type="submit" value="Reset All" id="ResetDownloadData" />
-            <input type="submit" value="Download" id="DownloadCheckedUrls" />
+            <input type="submit" value="Add" id="AddCheckedUrls" class="blue-bttn" />
+            <input type="submit" value="Unselect All" id="ResetCheckedUrls" class="blue-bttn" />
+            <input type="submit" value="Reset All" id="ResetDownloadData" class="blue-bttn" />
+            <input type="submit" value="Download" id="DownloadCheckedUrls" class="blue-bttn" />
         </form>
     </div>
     <div class="settings" id="settings">
