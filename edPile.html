@@ -298,25 +298,28 @@
 
                     // check box next to each urls
                     for (let i = 0; i < 10; i++) {
-                        const resultElement = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1})`);
-                        const url = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > div.gs-webResult.gs-result > div.gsc-thumbnail-inside > div > a`).href;
-                        const checkBox = document.createElement('INPUT');
-                        checkBox.setAttribute("type", "checkbox");
-                        checkBox.setAttribute("style", "float:  left; margin-right: 20px; width: 25px; height: 25px; cursor: pointer;");
-                        checkBox.setAttribute("name", url);
-                        checkBox.setAttribute("value", url);
-                        // inputElement.innerHTML = "Checkbox";
-                        checkBox.onclick = function () {
-                            const valueUrl = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`).value;
-                            const isChecked = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`).checked;
-                            if (isChecked) {
-                                checkedUrls.push(valueUrl);
-                            }
-                            else {
-                                checkedUrls = checkedUrls.filter(item => item !== valueUrl);
-                            }
-                        };
-                        resultElement.insertBefore(checkBox, resultElement.firstChild);
+                        const hasCheckBoxAlready = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`);
+                        if (!hasCheckBoxAlready) {
+                            const resultElement = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1})`);
+                            const url = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > div.gs-webResult.gs-result > div.gsc-thumbnail-inside > div > a`).href;
+                            const checkBox = document.createElement('INPUT');
+                            checkBox.setAttribute("type", "checkbox");
+                            checkBox.setAttribute("style", "float:  left; margin-right: 20px; width: 25px; height: 25px; cursor: pointer;");
+                            checkBox.setAttribute("name", url);
+                            checkBox.setAttribute("value", url);
+                            // inputElement.innerHTML = "Checkbox";
+                            checkBox.onclick = function () {
+                                const valueUrl = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`).value;
+                                const isChecked = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`).checked;
+                                if (isChecked) {
+                                    checkedUrls.push(valueUrl);
+                                }
+                                else {
+                                    checkedUrls = checkedUrls.filter(item => item !== valueUrl);
+                                }
+                            };
+                            resultElement.insertBefore(checkBox, resultElement.firstChild);
+                        }
                     }
                 });
             }
