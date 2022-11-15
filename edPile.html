@@ -243,7 +243,7 @@
             return false;
         }
 
-        function addCheckBoxes(e) {
+        function addCheckBoxes() {
             try {
                 Object.entries(defaultEngines).forEach(([key, value], index) => {
                     const myIframe = document.getElementById(`${key}`);
@@ -261,8 +261,10 @@
                         buttonElement.onclick = function () {
                             for (let i = 0; i < 10; i++) {
                                 const checkBx = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`);
-                                if (checkBx.checked === true) {
-                                    checkBx.click();
+                                if (checkBx) {
+                                    if (checkBx.checked === true) {
+                                        checkBx.click();
+                                    }
                                 }
                             }
                         };
@@ -281,8 +283,13 @@
                         buttonElement.onclick = function () {
                             for (let i = 0; i < 10; i++) {
                                 const checkBx = myIframe.contentWindow.document.querySelector(`#___gcse_0 > div > div > div > div.gsc-wrapper > div.gsc-resultsbox-visible > div.gsc-resultsRoot.gsc-tabData.gsc-tabdActive > div > div.gsc-expansionArea > div:nth-child(${i + 1}) > input[type=checkbox]`);
-                                if (checkBx.checked === false) {
-                                    checkBx.click();
+                                if (checkBx) {
+                                    if (checkBx.checked === false) {
+                                        checkBx.click();
+                                    }
+                                }
+                                else {
+                                    addCheckBoxes();
                                 }
                             }
                         };
@@ -320,10 +327,13 @@
         function addCheckedUrls() {
             let scraperType = document.getElementById('scraper-select').value;
             checkedUrls = [...new Set(checkedUrls)]; // remove duplicates
-            for (let i = 0; i < checkedUrls.length; i++) {
-                downloadData.push([scraperType, checkedUrls[i]]);
+            if (checkedUrls.length > 0) {
+                for (let i = 0; i < checkedUrls.length; i++) {
+                    downloadData.push([scraperType, checkedUrls[i]]);
+                }
+                alert("Add Success");
+                resetCheckedUrls();
             }
-            resetCheckedUrls();
         }
 
         function downloadCheckedUrls() {
@@ -334,18 +344,21 @@
                 window.open(encodedUri);
             }
             resetCheckedUrls();
-            resetDownloadData();
+            resetDownloadData(false);
         }
 
         function resetCheckedUrls() {
             checkedUrls = [];
         }
 
-        function resetDownloadData() {
+        function resetDownloadData(hasAlert) {
             checkedUrls = [];
             downloadData = [
                 ["type", "url"]
             ];
+            if (hasAlert) {
+                alert("Reset Success");
+            }
         }
 
         document.addEventListener('readystatechange', e => {
@@ -356,16 +369,13 @@
                 }
                 document.getElementById('cse-search-box-form-id').addEventListener('submit', function (e) {
                     executeQuery(e);
-                    addCheckBoxes(e);
+                    addCheckBoxes();
                 });
                 document.getElementById('AddCheckedUrls').addEventListener('click', function (e) {
                     addCheckedUrls();
                 });
-                document.getElementById('ResetCheckedUrls').addEventListener('click', function (e) {
-                    resetCheckedUrls();
-                });
                 document.getElementById('ResetDownloadData').addEventListener('click', function (e) {
-                    resetDownloadData();
+                    resetDownloadData(true);
                 });
                 document.getElementById('DownloadCheckedUrls').addEventListener('click', function (e) {
                     downloadCheckedUrls();
@@ -604,8 +614,7 @@
                 <option value="Twitter Video Transcript">Twitter Video Transcript</option>
             </select>
             <input type="submit" value="Add" id="AddCheckedUrls" class="blue-bttn" />
-            <input type="submit" value="Unselect All" id="ResetCheckedUrls" class="blue-bttn" />
-            <input type="submit" value="Reset All" id="ResetDownloadData" class="blue-bttn" />
+            <input type="submit" value="Reset" id="ResetDownloadData" class="blue-bttn" />
             <input type="submit" value="Download" id="DownloadCheckedUrls" class="blue-bttn" />
         </form>
     </div>
